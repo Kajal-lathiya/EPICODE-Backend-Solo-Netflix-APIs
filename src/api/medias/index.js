@@ -1,6 +1,6 @@
 import express from "express";
 import uniqid from "uniqid";
-import { getMedias, writeMedias } from "../../lib/fs-tools.js";
+import { getMedias, writeMedias, saveMediasImages } from "../../lib/fs-tools.js";
 import httpErrors from "http-errors";
 import { checkMediaSchema, triggerBadRequest } from "./validators.js";
 import multer from "multer";
@@ -73,7 +73,7 @@ mediasRouter.post(
     try {
       //Upload poster to single media
         const fileName = req.file.originalname;
-    //   await saveMediasImages(fileName, req.file.buffer);
+      await saveMediasImages(fileName, req.file.buffer);
       const url = `http://localhost:3001/posters/${fileName}`;
       const medias = await getMedias();
 
