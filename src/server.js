@@ -2,7 +2,7 @@ import express from "express";
 import listEndpoints from "express-list-endpoints";
 import mediasRouter from "./api/medias/index.js";
 import cors from "cors";
-import createHttpError from "http-errors"
+import createHttpError from "http-errors";
 
 import {
   badRequestHandler,

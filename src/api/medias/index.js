@@ -1,12 +1,28 @@
 import express from "express";
 import uniqid from "uniqid";
-import { getMedias, writeMedias, saveMediasImages } from "../../lib/fs-tools.js";
+import {
+  getMedias,
+  writeMedias,
+  saveMediasImages
+} from "../../lib/fs-tools.js";
 import httpErrors from "http-errors";
 import { checkMediaSchema, triggerBadRequest } from "./validators.js";
 import multer from "multer";
+import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+
 const { NotFound } = httpErrors;
 
 const mediasRouter = express.Router();
+
+const cloudinaryUploader = multer({
+  storage: new CloudinaryStorage({
+    cloudinary, // cloudinary is going to search in .env vars for smt called process.env.CLOUDINARY_URL
+    params: {
+      folder: "epicode/posters"
+    }
+  })
+}).single("poster");
 
 mediasRouter.post(
   "/",
@@ -66,37 +82,36 @@ mediasRouter.get("/:id", async (req, res, next) => {
   }
 });
 
-mediasRouter.post(
-  "/:id/poster",
-  multer().single("poster"),
-  async (req, res, next) => {
-    try {
-      //Upload poster to single media
-        const fileName = req.file.originalname;
-      await saveMediasImages(fileName, req.file.buffer);
-      const url = `http://localhost:3001/posters/${fileName}`;
-      const medias = await getMedias();
+mediasRouter.post("/:id/poster", cloudinaryUploader, async (req, res, next) => {
+  try {
+    //Upload poster to single media
+    // const fileName = req.file.originalname;
+    // await saveMediasImages(fileName, req.file.buffer);
+    // const url = `http://localhost:3001/posters/${fileName}`;
 
-      const index = medias.findIndex((media) => media.imdbID === req.params.id);
-      if (index !== -1) {
-        const oldMedia = medias[index];
+    console.log(req.file);
+    const url = req.file.path;
+    const medias = await getMedias();
 
-        const updateMedia = {
-          ...oldMedia,
-          poster: url,
-          updatedAt: new Date()
-        };
+    const index = medias.findIndex((media) => media.imdbID === req.params.id);
+    if (index !== -1) {
+      const oldMedia = medias[index];
 
-        medias[index] = updateMedia;
-        await writeMedias(medias);
-        res.send("file upload successfully");
-      }
-    } catch (error) {
-      console.log("error", error);
-      next(error);
+      const updateMedia = {
+        ...oldMedia,
+        poster: url,
+        updatedAt: new Date()
+      };
+
+      medias[index] = updateMedia;
+      await writeMedias(medias);
+      res.send("file upload successfully");
     }
+  } catch (error) {
+    console.log("error", error);
+    next(error);
   }
-);
+});
 
 mediasRouter.post("/:id/pdf", async (req, res, next) => {
   try {
