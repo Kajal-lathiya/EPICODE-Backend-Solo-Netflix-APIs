@@ -3,7 +3,7 @@ import uniqid from "uniqid";
 import {
   getMedias,
   writeMedias,
-  saveMediasImages, 
+  saveMediasImages,
   getPDFReadableStream
 } from "../../lib/fs-tools.js";
 import httpErrors from "http-errors";
@@ -119,21 +119,35 @@ mediasRouter.post("/:id/poster", cloudinaryUploader, async (req, res, next) => {
   }
 });
 
-mediasRouter.get("/:id/pdf", async (req, res, next) => {
-  try {
-    // Export single media data as PDF
-    // res.send("Export single media data as PDF");
+// mediasRouter.get("/:id/pdf", async (req, res, next) => {
+//   try {
+//     // Export single media data as PDF
+//     // res.send("Export single media data as PDF");
+//     res.setHeader(
+//       "Content-Disposition",
+//       "attachment; filename=singleMedia.pdf"
+//     );
+//     const mediaArray = await getMedias();
+//     // const media = mediaArray.find((media) => media.imdbID === req.params.id);
+//     const source = getPDFReadableStream(mediaArray);
+//     const destination = res;
+//     pipeline(source, destination, (err) => {
+//       if (err) console.log(err);
+//     });
+//   } catch (error) {
+//     console.log("error", error);
+//     next(error);
+//   }
+// });
 
-    const media = mediaArray.find((media) => media.imdbID === req.params.id);
-    const source = getPDFReadableStream(media);
-    const destination = res;
-    pipeline(source, destination, err => {
-    if (err) console.log(err);
-    })
-  } catch (error) {
-    console.log("error", error);
-    next(error);
-  }
-});
+mediasRouter.get("/pdf", async (req, res, next) => {
+  res.setHeader("Content-Disposition", "attachment; filename=test.pdf")
 
+  const books = await getMedias()
+  const source = getPDFReadableStream(books)
+  const destination = res
+  pipeline(source, destination, err => {
+    if (err) console.log(err)
+  })
+})
 export default mediasRouter;
