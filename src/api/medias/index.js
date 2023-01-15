@@ -3,13 +3,18 @@ import uniqid from "uniqid";
 import {
   getMedias,
   writeMedias,
-  saveMediasImages
+  saveMediasImages, 
+  getPDFReadableStream
 } from "../../lib/fs-tools.js";
 import httpErrors from "http-errors";
 import { checkMediaSchema, triggerBadRequest } from "./validators.js";
 import multer from "multer";
 import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
+
+import request from "request";
+import { pipeline } from "stream"; //CORE MODULE
+import { createGunzip } from "zlib"; //CORE MODULE
 
 const { NotFound } = httpErrors;
 
@@ -85,6 +90,7 @@ mediasRouter.get("/:id", async (req, res, next) => {
 mediasRouter.post("/:id/poster", cloudinaryUploader, async (req, res, next) => {
   try {
     //Upload poster to single media
+
     // const fileName = req.file.originalname;
     // await saveMediasImages(fileName, req.file.buffer);
     // const url = `http://localhost:3001/posters/${fileName}`;
@@ -113,10 +119,17 @@ mediasRouter.post("/:id/poster", cloudinaryUploader, async (req, res, next) => {
   }
 });
 
-mediasRouter.post("/:id/pdf", async (req, res, next) => {
+mediasRouter.get("/:id/pdf", async (req, res, next) => {
   try {
     // Export single media data as PDF
-    res.send("Export single media data as PDF");
+    // res.send("Export single media data as PDF");
+
+    const media = mediaArray.find((media) => media.imdbID === req.params.id);
+    const source = getPDFReadableStream(media);
+    const destination = res;
+    pipeline(source, destination, err => {
+    if (err) console.log(err);
+    })
   } catch (error) {
     console.log("error", error);
     next(error);

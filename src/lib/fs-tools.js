@@ -2,7 +2,7 @@ import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import fs from "fs-extra";
 
-const { readJSON, writeJSON, writeFile } = fs;
+const { readJSON, writeJSON, writeFile, createReadStream } = fs;
 
 const datafolderPath = join(dirname(fileURLToPath(import.meta.url)), "../data");
 const publicFolderPath = join(process.cwd(), "./public/images");
@@ -15,3 +15,5 @@ export const writeMedias = (mediaArray) =>
 
 export const saveMediasImages = (fileName, contentAsBuffer) =>
   writeFile(join(publicFolderPath, fileName), contentAsBuffer);
+
+  export const getPDFReadableStream = () => createReadStream(mediasJSONPath)
