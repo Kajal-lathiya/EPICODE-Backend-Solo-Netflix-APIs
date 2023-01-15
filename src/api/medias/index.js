@@ -47,7 +47,6 @@ mediasRouter.post(
       await writeMedias(mediaArray);
       res.status(201).send({ media_id: newMedia.imdbID });
     } catch (error) {
-      console.log("error", error);
       next(error);
     }
   }
@@ -66,7 +65,6 @@ mediasRouter.get("/", async (req, res, next) => {
       res.send(mediaArray);
     }
   } catch (error) {
-    console.log("error", error);
     next(error);
   }
 });
@@ -82,7 +80,6 @@ mediasRouter.get("/:id", async (req, res, next) => {
       next(NotFound(`media id ${req.params.id} not found!`));
     }
   } catch (error) {
-    console.log("error", error);
     next(error);
   }
 });
@@ -95,7 +92,6 @@ mediasRouter.post("/:id/poster", cloudinaryUploader, async (req, res, next) => {
     // await saveMediasImages(fileName, req.file.buffer);
     // const url = `http://localhost:3001/posters/${fileName}`;
 
-    console.log(req.file);
     const url = req.file.path;
     const medias = await getMedias();
 
@@ -119,37 +115,21 @@ mediasRouter.post("/:id/poster", cloudinaryUploader, async (req, res, next) => {
   }
 });
 
-// mediasRouter.get("/:id/pdf", async (req, res, next) => {
-//   try {
-//     // Export single media data as PDF
-//     // res.send("Export single media data as PDF");
-//     res.setHeader("Content-Disposition", "attachment; filename=test.pdf")
-
-//     const mediaArray = await getMedias();
-//     // const media = mediaArray.find((media) => media.imdbID === req.params.id);
-//     const source = getMediasJsonReadableStream(mediaArray);
-//     const destination = res;
-//     pipeline(source, destination, (err) => {
-//       if (err) console.log(err);
-//     });
-//   } catch (error) {
-//     console.log("error", error);
-//     next(error);
-//   }
-// });
-
-mediasRouter.get("/file", async (req, res, next) => {
-  console.log('====================================');
-  console.log('kakaka');
-  console.log('====================================');
-  res.setHeader("Content-Disposition", "attachment; filename=test.json")
-
-  const books = await getMedias()
-  console.log('books:', books);
-  const source = getMediasJsonReadableStream(books)
-  const destination = res
-  pipeline(source, destination, err => {
-    if (err) console.log(err)
-  })
-})
+mediasRouter.get("/:id/pdf", async (req, res, next) => {
+  try {
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=singleMedia.pdf"
+    );
+    const mediaArray = await getMedias();
+    const media = mediaArray.find((media) => media.imdbID === req.params.id);
+    const source = getMediasJsonReadableStream(media);
+    const destination = res;
+    pipeline(source, destination, (err) => {
+      if (err) console.log(err);
+    });
+  } catch (error) {
+    next(error);
+  }
+});
 export default mediasRouter;

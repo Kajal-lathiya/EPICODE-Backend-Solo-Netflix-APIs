@@ -26,7 +26,6 @@ export const checkMediaSchema = checkSchema(mediaSchema);
 
 export const triggerBadRequest = (req, res, next) => {
   const errors = validationResult(req);
-  console.log("errors:-", errors.array());
   if (!errors.isEmpty()) {
     next(
       createHttpError(400, "Errors during media validation", {
