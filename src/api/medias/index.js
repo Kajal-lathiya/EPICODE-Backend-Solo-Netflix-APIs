@@ -4,7 +4,7 @@ import {
   getMedias,
   writeMedias,
   saveMediasImages,
-  getPDFReadableStream
+  getMediasJsonReadableStream
 } from "../../lib/fs-tools.js";
 import httpErrors from "http-errors";
 import { checkMediaSchema, triggerBadRequest } from "./validators.js";
@@ -123,13 +123,11 @@ mediasRouter.post("/:id/poster", cloudinaryUploader, async (req, res, next) => {
 //   try {
 //     // Export single media data as PDF
 //     // res.send("Export single media data as PDF");
-//     res.setHeader(
-//       "Content-Disposition",
-//       "attachment; filename=singleMedia.pdf"
-//     );
+//     res.setHeader("Content-Disposition", "attachment; filename=test.pdf")
+
 //     const mediaArray = await getMedias();
 //     // const media = mediaArray.find((media) => media.imdbID === req.params.id);
-//     const source = getPDFReadableStream(mediaArray);
+//     const source = getMediasJsonReadableStream(mediaArray);
 //     const destination = res;
 //     pipeline(source, destination, (err) => {
 //       if (err) console.log(err);
@@ -140,11 +138,15 @@ mediasRouter.post("/:id/poster", cloudinaryUploader, async (req, res, next) => {
 //   }
 // });
 
-mediasRouter.get("/pdf", async (req, res, next) => {
-  res.setHeader("Content-Disposition", "attachment; filename=test.pdf")
+mediasRouter.get("/file", async (req, res, next) => {
+  console.log('====================================');
+  console.log('kakaka');
+  console.log('====================================');
+  res.setHeader("Content-Disposition", "attachment; filename=test.json")
 
   const books = await getMedias()
-  const source = getPDFReadableStream(books)
+  console.log('books:', books);
+  const source = getMediasJsonReadableStream(books)
   const destination = res
   pipeline(source, destination, err => {
     if (err) console.log(err)

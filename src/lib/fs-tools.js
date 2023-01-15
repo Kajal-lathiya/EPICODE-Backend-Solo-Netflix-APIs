@@ -6,7 +6,7 @@ const { readJSON, writeJSON, writeFile, createReadStream } = fs;
 
 const datafolderPath = join(dirname(fileURLToPath(import.meta.url)), "../data");
 const publicFolderPath = join(process.cwd(), "./public/images");
-console.log('process.cwd():', publicFolderPath);
+console.log("process.cwd():", publicFolderPath);
 const mediasJSONPath = join(datafolderPath, "medias.json");
 
 export const getMedias = () => readJSON(mediasJSONPath);
@@ -16,4 +16,5 @@ export const writeMedias = (mediaArray) =>
 export const saveMediasImages = (fileName, contentAsBuffer) =>
   writeFile(join(publicFolderPath, fileName), contentAsBuffer);
 
-  export const getPDFReadableStream = () => createReadStream(mediasJSONPath)
+export const getMediasJsonReadableStream = () => createReadStream(mediasJSONPath)
+
